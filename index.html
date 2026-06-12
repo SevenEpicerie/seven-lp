@@ -377,15 +377,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // ── Fetch produits depuis l'API Vercel ───────────────────
 async function fetchProducts() {
-  try {
-    const res = await fetch("/api/products");
-    const data = await res.json();
-    allProducts = data.products || [];
-  } catch (e) {
-    console.warn("API products non disponible, catalogue vide.", e);
-    allProducts = [];
-  }
-  buildCats(); // re-render avec les comptes réels
+  allProducts = [
+    { id:"1",  title:"Red Bull Spring Cherry Sakura",              price:4.00,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/RedbullSakura.png?v=1775829064" },
+    { id:"2",  title:"Red Bull Winter Edition Mûre & Vanille",     price:3.50,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/Sanstitre-4.png?v=1775857858" },
+    { id:"3",  title:"Fanta Strawberry Kiwi",                      price:2.50,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/fanta-strawberry-kiwi-5740700987984-31380632961187.webp?v=1775861824" },
+    { id:"4",  title:"Mogu Mogu Bubble Gum",                       price:2.00,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/mogu-mogu-bubble-gum-8850389118856-58190657716555.webp?v=1775862489" },
+    { id:"5",  title:"Box Mystère - M",                            price:15.00, img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/boitemysteretransparent.png?v=1778084452" },
+    { id:"6",  title:"Box Mystère - L",                            price:25.00, img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/box2_c263cbcf-b2b3-45e4-8854-8e7676bd696f.png?v=1778084414" },
+    { id:"7",  title:"Nutymax Crème de Pistache",                  price:3.50,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/Nutymaxpistache.webp?v=1775939178" },
+    { id:"8",  title:"Lion Bar White Chocolate",                   price:2.00,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/LionWhite.webp?v=1775939603" },
+    { id:"9",  title:"Snickers Creamy Peanut Butter",              price:2.00,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/snickers-creamy-peanut-butter-5900951283963-32089129386147.webp?v=1775940003" },
+    { id:"10", title:"Wonka Nerds Candy Rainbow Box",              price:3.00,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/wonka-nerds-candy-rainbow-box-079200558338-35470097350819.webp?v=1775991261" },
+    { id:"11", title:"Charm's Fluffy Stuff Cotton Candy",          price:3.50,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/charm-s-fluffy-stuff-cotton-candy-014200003259-1156794123.webp?v=1775991337" },
+    { id:"12", title:"Air Heads Cherry",                           price:1.50,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/air-heads-cherry-073390002015-57934053474635.webp?v=1775991447" },
+    { id:"13", title:"Candy Pop Popcorn Twix",                     price:4.00,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/candy-pop-popcorn-twix-814109023385-33161855729827.webp?v=1775992568" },
+    { id:"14", title:"Kellogg's Pop Tarts Frosted Cherry",         price:3.50,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/kellogg-s-pop-tarts-frosted-cherry-064100147737-55488010551627.webp?v=1775992667" },
+    { id:"15", title:"American Bakery Cookies & Cream Red Velvet", price:2.50,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/AmericanBakery_2.webp?v=1775992782" },
+    { id:"16", title:"Kinder Kornetti Crema",                      price:2.00,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/kinder-kornetti-a-la-creme-de-laitjpg-300x300.png?v=1775996306" },
+    { id:"17", title:"Frutz Pomme - Glace Trompe L'Oeil",         price:3.00,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/slide-pomme-300x300.png?v=1775996391" },
+    { id:"18", title:"Mister Frutz Mini Trompe L'Oeil",           price:4.00,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/whatsapp-image-2025-10-07-at-151631-300x300.jpg?v=1775996651" },
+    { id:"19", title:"Samyang Buldak Chips Quattro Cheese",        price:4.00,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/symg-potatochip-quattro-1500xpng-300x300.webp?v=1775998710" },
+    { id:"20", title:"Pringles Mingles Jalapeno & Queso",          price:4.50,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/prod-img-7243038-00038000309588-00038000309588-c1c1-updated-300x300.png?v=1775998837" },
+    { id:"21", title:"Pringles Spicy Mayo",                        price:4.50,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/img-ajqswvu5enzyfbw4-300x300.png?v=1775998921" },
+    { id:"22", title:"Samyang Ramen Rose",                         price:2.50,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/samyang-buldak-rose-36913034854563-grandewebp.jpg?v=1775999079" },
+    { id:"23", title:"Samyang Cheese",                             price:2.50,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/samyang-buldak-cheese-hot-chicken-flavour-ramen-140gwebp-300x300.png?v=1775999173" },
+    { id:"24", title:"Poliakov Vodka 70cl",                        price:16.00, img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/shopping.webp?v=1776244049" },
+    { id:"25", title:"Jack Daniel's Old No. 7 1L",                 price:35.00, img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/Jack_Daniel.webp?v=1776244298" },
+    { id:"26", title:"Vodka Peche Ciroc 70cl",                     price:38.00, img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/ciroc-peach-flavoured-vodka.jpg?v=1776244404" },
+    { id:"27", title:"Biere Blanche 5% 1664 - 33cl",               price:2.50,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/1664_sapphire_blanc_bottle_33cl_wet_lr_rgb-2.png?v=1776244494" },
+    { id:"28", title:"Get 27",                                     price:14.00, img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/FY21_GET_GET27_IPX.png?v=1776244627" },
+  ];
+  buildCats();
 }
 
 function getCatProducts(catId) {
