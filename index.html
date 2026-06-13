@@ -262,8 +262,9 @@ footer a{color:var(--mint);text-decoration:none}
       <div class="err-msg" id="err-zone" style="margin-top:8px">Sélectionnez votre zone.</div>
       <div class="field" style="margin-top:18px">
         <label class="lbl">Adresse complète *</label>
-        <input type="text" id="adresse" placeholder="12 rue de la République, Nancy">
+        <input type="text" id="adresse" placeholder="12 rue de la République, Nancy" oninput="checkCityMin(this.value)">
         <div class="err-msg">Renseignez votre adresse.</div>
+        <div id="city-min-strip" style="display:none;margin-top:10px;background:rgba(36,181,142,.08);border:1px solid rgba(36,181,142,.3);border-radius:9px;padding:10px 14px;font-size:.82rem;color:var(--mint2)"></div>
       </div>
     </div>
     <div class="card">
@@ -372,20 +373,76 @@ const EMAILJS_TPL  = "VOTRE_TEMPLATE_ID";
 const NOTIFY_EMAIL = "sevenepicerie.nancy@gmail.com";
 
 // ── Données statiques ───────────────────────────────────
+// Minimum de commande par ville (livraison gratuite au-dessus)
+const CITY_MINIMUMS = [
+  { city:"Nancy",                   min:15 },
+  { city:"Vandœuvre",               min:20 },
+  { city:"Vandoeuvre",              min:20 },
+  { city:"Laxou",                   min:25 },
+  { city:"Jarville",                min:25 },
+  { city:"Saint-Max",               min:25 },
+  { city:"Tomblaine",               min:25 },
+  { city:"Villers-lès-Nancy",       min:25 },
+  { city:"Villers-les-Nancy",       min:25 },
+  { city:"Haut du Lièvre",          min:30 },
+  { city:"Malzéville",              min:30 },
+  { city:"Malzeville",              min:30 },
+  { city:"Maxéville",               min:30 },
+  { city:"Maxeville",               min:30 },
+  { city:"Essey-lès-Nancy",         min:30 },
+  { city:"Essey-les-Nancy",         min:30 },
+  { city:"Houdemont",               min:30 },
+  { city:"Heillecourt",             min:30 },
+  { city:"Champigneulles",          min:40 },
+  { city:"Dommartemont",            min:35 },
+  { city:"Saulxure",                min:40 },
+  { city:"Villers-Clairieux",       min:40 },
+  { city:"Frouard",                 min:40 },
+  { city:"Seichamps",               min:40 },
+  { city:"Pulnoy",                  min:40 },
+  { city:"Fléville-devant-Nancy",   min:40 },
+  { city:"Fleville-devant-Nancy",   min:40 },
+  { city:"Ludres",                  min:40 },
+  { city:"Art-sur-Meurthe",         min:40 },
+  { city:"Pompey",                  min:45 },
+  { city:"Saint-Nicolas-de-Port",   min:50 },
+  { city:"Lay-Saint-Christophe",    min:50 },
+  { city:"Varangéville",            min:60 },
+  { city:"Varangeville",            min:60 },
+  { city:"Bouxières-aux-Dames",     min:70 },
+  { city:"Bouxieres-aux-Dames",     min:70 },
+];
+
+function getCityMin(address) {
+  if (!address) return null;
+  const addr = address.toLowerCase();
+  for (const c of CITY_MINIMUMS) {
+    if (addr.includes(c.city.toLowerCase())) return c;
+  }
+  return null;
+}
+
 const ZONES = [
   { id:"nc",  label:"Nancy Centre",    fee:"Gratuit", delay:"~15 min" },
   { id:"nn",  label:"Nancy Nord",      fee:"Gratuit", delay:"~20 min" },
   { id:"ns",  label:"Nancy Sud",       fee:"Gratuit", delay:"~20 min" },
   { id:"vdp", label:"Vandœuvre",       fee:"Gratuit", delay:"~25 min" },
-  { id:"lx",  label:"Laxou",           fee:"+2€",     delay:"~25 min" },
-  { id:"es",  label:"Essey-lès-Nancy", fee:"+2€",     delay:"~25 min" },
-  { id:"mv",  label:"Maxéville",       fee:"+2€",     delay:"~30 min" },
-  { id:"au",  label:"Autre",           fee:"Nous contacter", delay:"" },
+  { id:"lx",  label:"Laxou",           fee:"Gratuit", delay:"~25 min" },
+  { id:"es",  label:"Essey-lès-Nancy", fee:"Gratuit", delay:"~25 min" },
+  { id:"mv",  label:"Maxéville",       fee:"Gratuit", delay:"~30 min" },
+  { id:"jv",  label:"Jarville",        fee:"Gratuit", delay:"~20 min" },
+  { id:"tb",  label:"Tomblaine",       fee:"Gratuit", delay:"~20 min" },
+  { id:"sm",  label:"Saint-Max",       fee:"Gratuit", delay:"~20 min" },
+  { id:"au",  label:"Autre ville",     fee:"Gratuit", delay:"" },
 ];
 const CRENEAUX = [
-  {label:"Maintenant",icon:"⚡"},{label:"21h – 22h",icon:"🕙"},
-  {label:"22h – 23h",icon:"🕚"},{label:"23h – 00h",icon:"🕛"},
-  {label:"00h – 01h",icon:"🕐"},{label:"01h – 02h",icon:"🕑"},
+  {label:"Maintenant",icon:"⚡",custom:false},
+  {label:"21h – 22h", icon:"🕙",custom:false},
+  {label:"22h – 23h", icon:"🕚",custom:false},
+  {label:"23h – 00h", icon:"🕛",custom:false},
+  {label:"00h – 01h", icon:"🕐",custom:false},
+  {label:"01h – 02h", icon:"🕑",custom:false},
+  {label:"Autre",     icon:"✏️",custom:true},
 ];
 
 // Icônes par catégorie
@@ -473,9 +530,12 @@ function buildZones() {
 
 function buildCreneaux() {
   document.getElementById("creneau-grid").innerHTML = CRENEAUX.map(c =>
-    `<button class="creneau-btn" onclick="selectCreneau('${c.label}',this)">
+    `<button class="creneau-btn" onclick="selectCreneau('${c.label}',this,'${c.custom}')">
       <span>${c.icon}</span>${c.label}
-    </button>`).join("");
+    </button>`).join("") +
+    `<div id="custom-time-wrap" style="display:none;grid-column:1/-1;margin-top:4px">
+      <input type="time" id="custom-time" style="width:100%;background:var(--navy3);border:1px solid var(--mint);border-radius:9px;padding:11px 14px;font-family:'Inter',sans-serif;font-size:1rem;color:var(--white);outline:none" onchange="updateCustomTime(this.value)">
+    </div>`;
 }
 
 function buildCats() {
@@ -550,10 +610,38 @@ function selectZone(id,btn) {
   btn.classList.add("sel"); selZone=id;
   document.getElementById("err-zone").style.display="none";
 }
-function selectCreneau(label,btn) {
+function selectCreneau(label,btn,custom) {
   document.querySelectorAll(".creneau-btn").forEach(b=>b.classList.remove("sel"));
-  btn.classList.add("sel"); selCreneau=label;
+  btn.classList.add("sel");
+  const wrap = document.getElementById("custom-time-wrap");
+  if (custom === 'true') {
+    wrap.style.display = "block";
+    const val = document.getElementById("custom-time").value;
+    selCreneau = val ? "À " + val : null;
+  } else {
+    wrap.style.display = "none";
+    selCreneau = label;
+  }
   document.getElementById("err-creneau").style.display="none";
+}
+function updateCustomTime(val) {
+  selCreneau = val ? "À " + val : null;
+}
+function checkCityMin(address) {
+  const strip = document.getElementById("city-min-strip");
+  const match = getCityMin(address);
+  if (match) {
+    strip.style.display = "block";
+    strip.innerHTML = `📦 Livraison gratuite à <strong>${match.city}</strong> — minimum de commande : <strong>${match.min} €</strong>`;
+  } else if (address.length > 4) {
+    strip.style.display = "block";
+    strip.style.background = "rgba(156,216,232,.06)";
+    strip.style.borderColor = "rgba(156,216,232,.2)";
+    strip.style.color = "var(--muted)";
+    strip.innerHTML = `📍 Ville non reconnue — le minimum de commande sera confirmé par téléphone.`;
+  } else {
+    strip.style.display = "none";
+  }
 }
 function selectCat(cat,btn) {
   if (selCat===cat) {
