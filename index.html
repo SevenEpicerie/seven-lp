@@ -136,17 +136,6 @@ body{background:var(--bg);color:var(--white);font-family:'Inter',sans-serif;font
 .card-h-pill{background:var(--card2);border:1px solid var(--border);border-radius:99px;padding:2px 10px;font-size:.68rem;font-weight:600;color:var(--muted);font-family:'Inter',sans-serif}
 .card-sub{font-size:.82rem;color:var(--muted);margin-bottom:20px}
 
-/* ── Zone grid ── */
-.zone-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
-.zone-btn{
-  background:var(--card2);border:2px solid var(--border);border-radius:12px;
-  padding:14px 10px;cursor:pointer;text-align:center;
-  color:var(--white);font-family:'Inter',sans-serif;font-size:.84rem;font-weight:600;
-  transition:all .2s;
-}
-.zone-btn:hover{border-color:rgba(36,181,142,.4);background:rgba(36,181,142,.05)}
-.zone-btn.sel{border-color:var(--mint);background:rgba(36,181,142,.1);color:var(--mint2)}
-
 /* ── Adresse & minimum ── */
 .addr-min{
   margin-top:10px;border-radius:10px;padding:10px 14px;font-size:.82rem;
@@ -384,10 +373,8 @@ footer a{color:var(--mint);text-decoration:none}
   <div class="panel show" id="p1">
 
     <div class="card">
-      <div class="card-h">📍 Zone de livraison <span class="card-h-pill">Étape 1/3</span></div>
-      <div class="card-sub">Sélectionnez votre ville</div>
-      <div class="zone-grid" id="zone-grid"></div>
-      <div class="err" id="err-zone" style="display:none;margin-top:8px">Sélectionnez votre ville.</div>
+      <div class="card-h">📍 Adresse de livraison <span class="card-h-pill">Étape 1/3</span></div>
+
 
       <div class="field" style="margin-top:18px">
         <label class="lbl">Adresse complète *</label>
@@ -566,11 +553,6 @@ const CITY_MIN = [
   {c:"Bouxières-aux-Dames",m:70},{c:"Bouxieres-aux-Dames",m:70},
 ];
 
-const ZONES = [
-  "Nancy","Vandœuvre","Laxou","Jarville","Tomblaine",
-  "Saint-Max","Maxéville","Essey-lès-Nancy","Autre ville"
-];
-
 const CRENEAUX = [
   {l:"Maintenant",i:"⚡",c:false},{l:"21h – 22h",i:"🕙",c:false},
   {l:"22h – 23h",i:"🕚",c:false},{l:"23h – 00h",i:"🕛",c:false},
@@ -623,7 +605,6 @@ function initAutocomplete(){
 document.addEventListener("DOMContentLoaded",()=>{
   emailjs.init(EMAILJS_KEY);
 
-  buildZones();
   buildCreneaux();
   fetchProducts();
 });
@@ -649,12 +630,6 @@ async function fetchProducts(){
 function catProds(cat){ return products.filter(p=>(p.category||"divers").toLowerCase()===cat.toLowerCase()); }
 
 // ══ BUILD UI ═══════════════════════════════════════════════
-function buildZones(){
-  document.getElementById("zone-grid").innerHTML = ZONES.map(z=>
-    `<button class="zone-btn" onclick="selZ('${z}',this)">${z}</button>`
-  ).join("");
-}
-
 function buildCreneaux(){
   const grid = document.getElementById("creneau-grid");
   const wrap = document.getElementById("custom-time-wrap");
@@ -723,11 +698,6 @@ function renderProds(cat){
 }
 
 // ══ INTERACTIONS ═══════════════════════════════════════════
-function selZ(z,btn){
-  document.querySelectorAll(".zone-btn").forEach(b=>b.classList.remove("sel"));
-  btn.classList.add("sel"); selZone=z;
-  document.getElementById("err-zone").style.display="none";
-}
 
 function selC(label,btn,custom){
   document.querySelectorAll(".creneau-btn").forEach(b=>b.classList.remove("sel"));
@@ -830,7 +800,6 @@ function updateSteps(s){
 // ══ VALIDATION ══════════════════════════════════════════════
 function v1(){
   let ok=true;
-  if(!selZone){document.getElementById("err-zone").style.display="block";ok=false;}
   const a=document.getElementById("adresse");
   const aw=a.closest(".field");
   if(!a.value.trim()){aw.classList.add("has-err");ok=false;}else aw.classList.remove("has-err");
@@ -859,7 +828,7 @@ function buildRecap(){
   const total=items.reduce((a,[,v])=>a+(v.price||0)*v.qty,0);
   const ft=document.getElementById("freetext").value.trim();
   let h=`
-    <div class="rr"><span class="rk">Zone</span><span class="rv">${selZone||"—"}</span></div>
+
     <div class="rr"><span class="rk">Adresse</span><span class="rv">${document.getElementById("adresse").value}</span></div>
     <div class="rr"><span class="rk">Créneau</span><span class="rv">${selCreneau||"—"}</span></div>`;
   if(items.length){
@@ -901,7 +870,7 @@ async function submit(){
   const msg=[
     `🛒 *Nouvelle commande SEVEN*`,``,
     `👤 ${prenom}`,`📞 ${tel}`,
-    `📍 ${selZone} — ${adresse}`,`🕐 ${selCreneau}`,``,
+    `📍 ${adresse}`,`🕐 ${selCreneau}`,``,
     lines?`🛍️ Panier :\n${lines}`:"",
     ft?`📝 Autres : ${ft}`:"",
     total>0?`💶 Total estimé : ≥ ${total.toFixed(2)} €`:"",
