@@ -28,9 +28,9 @@ body{background:var(--bg);color:var(--white);font-family:'Inter',sans-serif;font
 /* ── HERO ── */
 .hero{
   min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  text-align:center;padding:80px 24px 60px;position:relative;z-index:1;
+  text-align:center;padding:16px 24px 12px;position:relative;z-index:1;
 }
-.hero-logo{height:130px;width:auto;margin-bottom:32px;filter:drop-shadow(0 0 32px rgba(36,181,142,.4));animation:logoIn .8s ease both}
+.hero-logo{width:min(82vw,580px);height:auto;margin-bottom:8px;filter:drop-shadow(0 0 32px rgba(36,181,142,.4));animation:logoIn .8s ease both}
 @keyframes logoIn{from{opacity:0;transform:translateY(-20px) scale(.95)}to{opacity:1;transform:none}}
 
 .hero-badge{
@@ -38,7 +38,7 @@ body{background:var(--bg);color:var(--white);font-family:'Inter',sans-serif;font
   background:rgba(36,181,142,.1);border:1px solid rgba(36,181,142,.35);
   border-radius:99px;padding:6px 16px;
   font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--mint2);
-  margin-bottom:28px;animation:fadeUp .6s ease .2s both;
+  margin-bottom:8px;animation:fadeUp .6s ease .2s both;
 }
 .badge-dot{width:7px;height:7px;border-radius:50%;background:var(--mint2);animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.5)}}
@@ -48,7 +48,7 @@ body{background:var(--bg);color:var(--white);font-family:'Inter',sans-serif;font
   font-size:clamp(2.6rem,8vw,5rem);
   font-weight:800;line-height:1.05;
   letter-spacing:-.03em;
-  margin-bottom:20px;
+  margin-bottom:8px;
   animation:fadeUp .6s ease .3s both;
 }
 .hero h1 .accent{color:var(--mint)}
@@ -56,13 +56,13 @@ body{background:var(--bg);color:var(--white);font-family:'Inter',sans-serif;font
 
 .hero-sub{
   font-size:clamp(1rem,2.5vw,1.2rem);color:var(--muted);
-  max-width:480px;margin:0 auto 36px;
+  max-width:480px;margin:0 auto 12px;
   animation:fadeUp .6s ease .4s both;
 }
 
 .hero-cta{
   display:flex;gap:12px;justify-content:center;flex-wrap:wrap;
-  animation:fadeUp .6s ease .5s both;margin-bottom:48px;
+  animation:fadeUp .6s ease .5s both;margin-bottom:14px;
 }
 .btn-hero{
   background:var(--mint);color:#0B0F1B;
@@ -81,7 +81,7 @@ body{background:var(--bg);color:var(--white);font-family:'Inter',sans-serif;font
 .btn-hero-outline:hover{border-color:var(--ice);color:var(--ice)}
 
 .hero-stats{
-  display:flex;gap:32px;justify-content:center;flex-wrap:wrap;
+  display:flex;gap:20px;justify-content:center;flex-wrap:wrap;
   animation:fadeUp .6s ease .6s both;
 }
 .stat{text-align:center}
@@ -250,14 +250,14 @@ textarea{resize:vertical;min-height:88px}
 .btn-back{
   width:100%;background:transparent;border:1px solid rgba(156,216,232,.15);color:var(--muted);
   border-radius:12px;padding:13px 24px;font-family:'Space Grotesk',sans-serif;
-  font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;margin-bottom:10px;
+  font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;margin-bottom:8px;
 }
 .btn-back:hover{color:var(--white);border-color:rgba(156,216,232,.3)}
 
 /* ── Success ── */
 .success{text-align:center;padding:56px 16px}
 .s-icon{width:72px;height:72px;border-radius:50%;background:rgba(36,181,142,.12);border:2px solid var(--mint);display:flex;align-items:center;justify-content:center;font-size:1.9rem;margin:0 auto 24px;animation:fadeUp .4s ease}
-.success h2{font-family:'Space Grotesk',sans-serif;font-size:1.6rem;font-weight:700;margin-bottom:10px;animation:fadeUp .4s ease .1s both}
+.success h2{font-family:'Space Grotesk',sans-serif;font-size:1.6rem;font-weight:700;margin-bottom:8px;animation:fadeUp .4s ease .1s both}
 .success p{color:var(--muted);max-width:300px;margin:0 auto 28px;animation:fadeUp .4s ease .2s both}
 .btn-wa{display:inline-flex;align-items:center;gap:9px;background:#25D366;color:#fff;text-decoration:none;border-radius:12px;padding:14px 26px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.95rem;transition:all .2s;animation:fadeUp .4s ease .3s both}
 .btn-wa:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(37,211,102,.3)}
