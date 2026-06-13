@@ -1,76 +1,40 @@
-// api/products.js — Vercel Serverless Function
-// Appelle l'API Shopify Storefront et renvoie les produits au frontend
-// Variables d'environnement requises sur Vercel :
-//   SHOPIFY_STORE_DOMAIN   → ex: seven-epicerie.myshopify.com
-//   SHOPIFY_STOREFRONT_TOKEN → token public Storefront API (lecture seule)
-
+// api/products.js — lit le Google Sheet public SEVEN Catalogue
 export default async function handler(req, res) {
-  // CORS : autorise ton domaine à appeler cet endpoint
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET");
 
-  const { SHOPIFY_STORE_DOMAIN, SHOPIFY_STOREFRONT_TOKEN } = process.env;
-
-  if (!SHOPIFY_STORE_DOMAIN || !SHOPIFY_STOREFRONT_TOKEN) {
-    return res.status(500).json({ error: "Variables d'environnement manquantes." });
-  }
-
-  const query = `
-    {
-      products(first: 50, query: "status:active") {
-        edges {
-          node {
-            id
-            title
-            handle
-            featuredImage { url(transform: { maxWidth: 400, maxHeight: 400 }) }
-            priceRange {
-              minVariantPrice { amount currencyCode }
-            }
-            variants(first: 1) {
-              edges {
-                node {
-                  id
-                  price { amount currencyCode }
-                  availableForSale
-                  quantityAvailable
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  `;
+  const SHEET_ID = "1b5v3fzVa8xBgrp9IZYmu0mfJodjE3OStLspC1b9ghIw";
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
 
   try {
-    const response = await fetch(
-      `https://${SHOPIFY_STORE_DOMAIN}/api/2024-01/graphql.json`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Shopify-Storefront-Access-Token": SHOPIFY_STOREFRONT_TOKEN,
-        },
-        body: JSON.stringify({ query }),
-      }
-    );
+    const response = await fetch(url);
+    const text = await response.text();
 
-    const data = await response.json();
+    // Google renvoie du JSONP — on extrait le JSON
+    const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/)[1]);
+    const rows = json.table.rows;
+    const cols = json.table.cols.map(c => c.label.toLowerCase());
 
-    const products = data.data.products.edges.map(({ node }) => ({
-      id: node.id.replace("gid://shopify/Product/", ""),
-      title: node.title,
-      handle: node.handle,
-      img: node.featuredImage?.url || null,
-      price: parseFloat(node.variants.edges[0]?.node.price.amount || 0),
-      available: node.variants.edges[0]?.node.availableForSale ?? true,
-    }));
+    const products = rows
+      .filter(row => row.c && row.c[0] && row.c[0].v) // ignorer lignes vides
+      .map(row => {
+        const obj = {};
+        cols.forEach((col, i) => {
+          obj[col] = row.c[i] ? row.c[i].v : null;
+        });
+        return {
+          id:       String(obj.id || ""),
+          title:    String(obj.title || ""),
+          price:    parseFloat(obj.price) || 0,
+          category: String(obj.category || "").toLowerCase(),
+          img:      obj.image ? String(obj.image) : null,
+        };
+      });
 
-    // Cache 5 minutes côté CDN Vercel
-    res.setHeader("Cache-Control", "s-maxage=300, stale-while-revalidate");
+    // Cache 2 minutes
+    res.setHeader("Cache-Control", "s-maxage=120, stale-while-revalidate");
     return res.status(200).json({ products });
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: err.message, products: [] });
   }
 }

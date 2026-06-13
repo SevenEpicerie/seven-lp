@@ -7,6 +7,7 @@
 <meta name="description" content="Livraison de snacks exotiques, sodas rares et alcools à Nancy en moins de 30 min. Ouvert jusqu'à 2h.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -16,31 +17,48 @@
   --r:13px;
 }
 html{scroll-behavior:smooth}
-body{background:var(--navy);color:var(--white);font-family:'Inter',sans-serif;font-size:16px;line-height:1.6;min-height:100vh}
+body{background:var(--navy);color:var(--white);font-family:'Inter',sans-serif;font-size:16px;line-height:1.6;min-height:100vh;overflow-x:hidden}
+
+/* ── Particules ── */
+#particles{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
+.particle{position:absolute;border-radius:50%;background:var(--ice);animation:float linear infinite;opacity:0}
+@keyframes float{
+  0%{transform:translateY(100vh) scale(0);opacity:0}
+  10%{opacity:1}
+  90%{opacity:.6}
+  100%{transform:translateY(-10vh) scale(1);opacity:0}
+}
 
 /* ── Header ── */
 header{
-  padding:18px 24px;display:flex;align-items:center;justify-content:space-between;
+  padding:14px 24px;display:flex;align-items:center;justify-content:space-between;
   position:sticky;top:0;z-index:100;
   background:rgba(14,22,40,.92);backdrop-filter:blur(14px);
   border-bottom:1px solid rgba(156,216,232,.1);
 }
-.logo{display:flex;align-items:center;gap:9px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.25rem;letter-spacing:.06em;color:var(--white);text-decoration:none}
-.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--mint);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.65)}}
-.badge{font-size:.72rem;font-weight:500;color:var(--mint2);background:rgba(36,181,142,.1);border:1px solid rgba(36,181,142,.3);padding:4px 11px;border-radius:99px}
+.logo-img{height:44px;width:auto}
+.badge{font-size:.72rem;font-weight:500;color:var(--mint2);background:rgba(36,181,142,.1);border:1px solid rgba(36,181,142,.3);padding:4px 11px;border-radius:99px;display:flex;align-items:center;gap:6px}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:var(--mint2);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.6)}}
 
 /* ── Layout ── */
-.wrap{max-width:660px;margin:0 auto;padding:0 20px 80px}
+.wrap{max-width:660px;margin:0 auto;padding:0 20px 80px;position:relative;z-index:1}
 
 /* ── Hero ── */
-.hero{text-align:center;padding:56px 0 40px}
-.eyebrow{font-size:.72rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--ice);margin-bottom:14px}
-h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(2rem,5vw,3rem);font-weight:700;line-height:1.1;letter-spacing:-.02em;margin-bottom:14px}
+.hero{text-align:center;padding:52px 0 36px}
+.hero-logo{height:90px;width:auto;margin:0 auto 24px;display:block;filter:drop-shadow(0 0 24px rgba(36,181,142,.35))}
+.hero-tagline{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--navy2);border:1px solid rgba(156,216,232,.15);
+  border-radius:99px;padding:6px 16px;
+  font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ice);
+  margin-bottom:20px;
+}
+h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.9rem,5vw,2.9rem);font-weight:700;line-height:1.1;letter-spacing:-.02em;margin-bottom:14px}
 h1 em{font-style:normal;color:var(--mint)}
 .hero-sub{color:var(--muted);font-size:1rem;margin-bottom:22px}
 .pills{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
-.pill{font-size:.75rem;font-weight:500;color:var(--white);background:var(--navy3);border:1px solid rgba(156,216,232,.12);padding:5px 12px;border-radius:99px}
+.pill{font-size:.75rem;font-weight:500;color:var(--white);background:var(--navy2);border:1px solid rgba(156,216,232,.12);padding:5px 12px;border-radius:99px}
 
 /* ── Step indicator ── */
 .steps{display:flex;align-items:center;justify-content:center;margin-bottom:36px}
@@ -54,8 +72,9 @@ h1 em{font-style:normal;color:var(--mint)}
 .step-lbl.active{color:var(--mint)}
 
 /* ── Card ── */
-.card{background:var(--navy2);border:1px solid rgba(156,216,232,.1);border-radius:var(--r);padding:24px 20px;margin-bottom:14px}
-.card-title{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:1rem;margin-bottom:4px}
+.card{background:rgba(22,32,53,.85);backdrop-filter:blur(8px);border:1px solid rgba(156,216,232,.1);border-radius:var(--r);padding:24px 20px;margin-bottom:14px}
+.card-title{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:1rem;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.card-title-badge{background:var(--navy3);border:1px solid rgba(156,216,232,.15);border-radius:99px;padding:3px 10px;font-size:.72rem;font-weight:600;color:var(--white)}
 .card-sub{font-size:.82rem;color:var(--muted);margin-bottom:18px}
 
 /* ── Zone grid ── */
@@ -84,8 +103,9 @@ h1 em{font-style:normal;color:var(--mint)}
 
 /* ── Product grid ── */
 .products-section{border-top:1px solid rgba(156,216,232,.08);padding-top:18px;margin-top:4px}
-.products-header{display:flex;align-items:center;gap:8px;margin-bottom:14px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.92rem}
-.products-header span.count{margin-left:auto;font-size:.72rem;color:var(--muted);font-weight:400}
+.products-header{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.products-header-title{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.92rem;display:flex;align-items:center;gap:7px}
+.products-header-badge{background:var(--navy3);border:1px solid rgba(156,216,232,.15);border-radius:99px;padding:2px 9px;font-size:.68rem;font-weight:600;color:var(--muted)}
 .prod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
 
 /* ── Product card ── */
@@ -107,7 +127,7 @@ h1 em{font-style:normal;color:var(--mint)}
 .qty-ctrl .plus{background:var(--mint);color:var(--navy);border-color:transparent}
 .qty-ctrl .num{font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--mint);min-width:14px;text-align:center;font-size:.88rem}
 
-/* ── Skeleton loader ── */
+/* ── Skeleton ── */
 .skeleton{background:linear-gradient(90deg,var(--navy3) 25%,var(--navy2) 50%,var(--navy3) 75%);background-size:200%;animation:shimmer 1.4s infinite;border-radius:11px;height:185px}
 @keyframes shimmer{0%{background-position:200%}100%{background-position:-200%}}
 
@@ -149,6 +169,13 @@ select option{background:var(--navy3)}
 .btn-back{width:100%;background:transparent;border:1px solid rgba(156,216,232,.15);color:var(--muted);border-radius:11px;padding:13px 24px;font-family:'Space Grotesk',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;margin-bottom:9px}
 .btn-back:hover{color:var(--white);border-color:rgba(156,216,232,.3)}
 
+/* ── Loading ── */
+.loading{text-align:center;padding:32px;color:var(--muted);font-size:.88rem}
+.loading-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--mint);margin:0 3px;animation:bounce .8s infinite}
+.loading-dot:nth-child(2){animation-delay:.15s}
+.loading-dot:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
+
 /* ── Success ── */
 .success{text-align:center;padding:52px 16px}
 .success-icon{width:68px;height:68px;border-radius:50%;background:rgba(36,181,142,.12);border:2px solid var(--mint);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 24px;animation:fadeUp .4s ease}
@@ -157,14 +184,19 @@ select option{background:var(--navy3)}
 .btn-wa{display:inline-flex;align-items:center;gap:9px;background:#25D366;color:#fff;text-decoration:none;border-radius:11px;padding:14px 26px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.95rem;transition:all .2s;animation:fadeUp .4s ease .3s both}
 .btn-wa:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(37,211,102,.3)}
 
-/* ── Panel visibility ── */
+/* ── Panel ── */
 .panel{display:none}
 .panel.show{display:block;animation:fadeUp .3s ease}
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── Footer ── */
-footer{text-align:center;padding:28px 20px;color:var(--muted);font-size:.75rem;border-top:1px solid rgba(156,216,232,.07)}
+footer{text-align:center;padding:28px 20px;color:var(--muted);font-size:.75rem;border-top:1px solid rgba(156,216,232,.07);position:relative;z-index:1}
 footer a{color:var(--mint);text-decoration:none}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--navy)}
+::-webkit-scrollbar-thumb{background:var(--navy3);border-radius:3px}
 
 @media(max-width:500px){
   .creneau-grid{grid-template-columns:repeat(2,1fr)}
@@ -176,16 +208,23 @@ footer a{color:var(--mint);text-decoration:none}
 </head>
 <body>
 
+<!-- Particules -->
+<div id="particles"></div>
+
 <header>
-  <a href="#" class="logo"><span class="logo-dot"></span>SEVEN</a>
-  <span class="badge" id="status-badge">⚡ Livraison active</span>
+  <img src="https://cdn.shopify.com/s/files/1/1025/6000/6484/files/logoombretr.png" alt="SEVEN" class="logo-img" onerror="this.style.display='none';document.getElementById('logo-fallback').style.display='flex'">
+  <div id="logo-fallback" style="display:none;align-items:center;gap:8px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.2rem;letter-spacing:.06em">
+    <span style="color:var(--ice)">SEV</span><span style="color:var(--mint)">7</span><span style="color:var(--ice)">N</span>
+  </div>
+  <div class="badge"><span class="badge-dot"></span>Livraison active</div>
 </header>
 
 <div class="wrap">
 
-  <!-- HERO (step 1 only) -->
+  <!-- HERO -->
   <div class="hero" id="hero">
-    <div class="eyebrow">· Épicerie · Nancy ·</div>
+    <img src="https://cdn.shopify.com/s/files/1/1025/6000/6484/files/logoombretr.png" alt="SEVEN Épicerie" class="hero-logo" onerror="this.style.display='none'">
+    <div class="hero-tagline">· 食料品店 · Nancy ·</div>
     <h1>Livré chez vous<br><em>en moins de 30 min</em></h1>
     <p class="hero-sub">Snacks exotiques, sodas rares, alcools — commandez en 2 min.</p>
     <div class="pills">
@@ -214,14 +253,12 @@ footer a{color:var(--mint);text-decoration:none}
     </div>
   </div>
 
-  <!-- ── STEP 1 ── -->
+  <!-- STEP 1 -->
   <div class="panel show" id="panel1">
     <div class="card">
-      <div class="card-title">Où livrer ?</div>
+      <div class="card-title">📍 <span>Où livrer ?</span><span class="card-title-badge">Étape 1</span></div>
       <div class="card-sub">Choisissez votre secteur</div>
-      <div class="zone-grid" id="zone-grid">
-        <!-- généré JS -->
-      </div>
+      <div class="zone-grid" id="zone-grid"></div>
       <div class="err-msg" id="err-zone" style="margin-top:8px">Sélectionnez votre zone.</div>
       <div class="field" style="margin-top:18px">
         <label class="lbl">Adresse complète *</label>
@@ -230,50 +267,49 @@ footer a{color:var(--mint);text-decoration:none}
       </div>
     </div>
     <div class="card">
-      <div class="card-title">Quand ?</div>
-      <div class="card-sub">Créneaux disponibles ce soir</div>
-      <div class="creneau-grid" id="creneau-grid">
-        <!-- généré JS -->
-      </div>
+      <div class="card-title">🕐 <span>Quand ?</span><span class="card-title-badge">Ce soir</span></div>
+      <div class="card-sub">Créneaux disponibles</div>
+      <div class="creneau-grid" id="creneau-grid"></div>
       <div class="err-msg" id="err-creneau" style="margin-top:8px">Choisissez un créneau.</div>
     </div>
     <button class="btn-primary" onclick="goTo(2)">Continuer → Choisir mes produits</button>
   </div>
 
-  <!-- ── STEP 2 ── -->
+  <!-- STEP 2 -->
   <div class="panel" id="panel2">
     <div class="card">
-      <div class="card-title">Qu'est-ce qu'il vous faut ?</div>
+      <div class="card-title">🛍️ <span>Qu'est-ce qu'il vous faut ?</span></div>
       <div class="card-sub">Tapez sur une catégorie pour voir les produits</div>
-      <div class="cat-grid" id="cat-grid">
-        <!-- généré JS -->
+      <div id="cat-loading" class="loading">
+        <span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span>
       </div>
+      <div class="cat-grid" id="cat-grid" style="display:none"></div>
       <div class="products-section" id="products-section" style="display:none">
-        <div class="products-header" id="products-header"></div>
+        <div class="products-header">
+          <div class="products-header-title" id="products-header-title"></div>
+          <span class="products-header-badge" id="products-header-count"></span>
+        </div>
         <div class="prod-grid" id="prod-grid"></div>
       </div>
     </div>
-
     <div id="cart-strip-wrap"></div>
-
     <div class="card">
       <label class="lbl">Vous cherchez autre chose ?</label>
       <textarea id="freetext" placeholder="Ex : Takis bleus, Prime Energy fraise, chips Lay's…"></textarea>
       <div class="err-msg" id="err-commande" style="margin-top:6px">Ajoutez des produits ou décrivez votre commande.</div>
       <div class="info-strip" style="margin-top:14px;margin-bottom:0">
         <span>💡</span>
-        <span>Les prix affichés sont ceux de votre boutique Shopify, mis à jour en temps réel. Si un prix est à 0€, il sera confirmé par téléphone.</span>
+        <span>Prix et produits mis à jour en temps réel depuis notre catalogue. Si un prix est à 0€, il sera confirmé par téléphone.</span>
       </div>
     </div>
-
     <button class="btn-back" onclick="goTo(1)">← Retour</button>
     <button class="btn-primary" onclick="goTo(3)">Continuer → Mes coordonnées</button>
   </div>
 
-  <!-- ── STEP 3 ── -->
+  <!-- STEP 3 -->
   <div class="panel" id="panel3">
     <div class="card">
-      <div class="card-title">Vos coordonnées</div>
+      <div class="card-title">👤 <span>Vos coordonnées</span></div>
       <div class="card-sub">Pour vous rappeler et livrer</div>
       <div class="field-row">
         <div class="field" id="f-prenom">
@@ -296,21 +332,18 @@ footer a{color:var(--mint);text-decoration:none}
         <input type="text" id="note" placeholder="Digicode, étage, interphone…">
       </div>
     </div>
-
-    <!-- Récap dynamique -->
     <div class="card" id="recap-card">
-      <div class="card-title" style="margin-bottom:14px">Récapitulatif</div>
+      <div class="card-title" style="margin-bottom:14px">✅ <span>Récapitulatif</span></div>
       <div class="recap-block" id="recap-block"></div>
       <div class="info-strip" style="margin-bottom:0">
         <span>📞</span><span>On vous rappelle dans les <strong>5 min</strong> pour confirmer et lancer la livraison.</span>
       </div>
     </div>
-
     <button class="btn-back" onclick="goTo(2)">← Retour</button>
-    <button class="btn-primary" onclick="submit()">🚀 Envoyer ma commande</button>
+    <button class="btn-primary" id="btn-submit" onclick="submit()">🚀 Envoyer ma commande</button>
   </div>
 
-  <!-- ── SUCCESS ── -->
+  <!-- SUCCESS -->
   <div class="panel" id="panel-ok">
     <div class="success">
       <div class="success-icon">✓</div>
@@ -331,10 +364,14 @@ footer a{color:var(--mint);text-decoration:none}
 </footer>
 
 <script>
-// ── Config ──────────────────────────────────────────────
-const WA_NUMBER = "33XXXXXXXXX"; // ← ton numéro sans +
+// ── Config ─────────────────────────────────────────────
+const WA_NUMBER    = "33XXXXXXXXX";           // ← ton numéro pro quand tu l'auras
+const EMAILJS_KEY  = "VOTRE_CLE_EMAILJS";     // ← à configurer
+const EMAILJS_SVC  = "VOTRE_SERVICE_ID";
+const EMAILJS_TPL  = "VOTRE_TEMPLATE_ID";
+const NOTIFY_EMAIL = "sevenepicerie.nancy@gmail.com";
 
-// ── Données statiques ────────────────────────────────────
+// ── Données statiques ───────────────────────────────────
 const ZONES = [
   { id:"nc",  label:"Nancy Centre",    fee:"Gratuit", delay:"~15 min" },
   { id:"nn",  label:"Nancy Nord",      fee:"Gratuit", delay:"~20 min" },
@@ -350,118 +387,132 @@ const CRENEAUX = [
   {label:"22h – 23h",icon:"🕚"},{label:"23h – 00h",icon:"🕛"},
   {label:"00h – 01h",icon:"🕐"},{label:"01h – 02h",icon:"🕑"},
 ];
-const CATEGORIES = [
-  { id:"alcools",  label:"Alcools & Spirits",  icon:"🥃", kw:["vodka","whiskey","whisky","jack","ciroc","poliakov","bière","1664","get 27","rhum","gin","liqueur"] },
-  { id:"sodas",    label:"Sodas & Boissons",   icon:"🥤", kw:["red bull","redbull","fanta","soda","energy","mogu","drink"] },
-  { id:"snacks",   label:"Snacks & Chips",     icon:"🍟", kw:["pringles","chips","samyang buldak chips","popcorn","takis"] },
-  { id:"candy",    label:"Candy & Bonbons",    icon:"🍬", kw:["nerds","airheads","air heads","cotton candy","fluffy","candy","wonka","charms"] },
-  { id:"choco",    label:"Chocolat & Barres",  icon:"🍫", kw:["snickers","lion","kinder","twix","chocolat","nutymax","pop tart","cookies","american bakery"] },
-  { id:"nouilles", label:"Nouilles & Plats",   icon:"🍜", kw:["samyang ramen","samyang cheese","ramen","nouilles","noodle"] },
-  { id:"glaces",   label:"Glaces & Surgelé",   icon:"🧊", kw:["frutz","glace","trompe","mister"] },
-  { id:"boxes",    label:"Box Mystère",         icon:"✨", kw:["box","mystère"] },
-];
 
-// ── State ────────────────────────────────────────────────
-let currentStep = 1;
-let selZone = null, selCreneau = null, selCat = null;
-let cart = {}; // { shopifyProductId: { title, price, qty } }
-let allProducts = []; // chargés depuis /api/products
+// Icônes par catégorie
+const CAT_ICONS = {
+  alcools:"🥃", spirits:"🥃", boissons:"🥤", sodas:"🥤", energy:"⚡",
+  snacks:"🍟", chips:"🍟", candy:"🍬", bonbons:"🍬",
+  chocolat:"🍫", barres:"🍫", nouilles:"🍜", ramen:"🍜",
+  glaces:"🧊", surgele:"🧊", box:"✨", mystere:"✨",
+  default:"🛍️"
+};
+function catIcon(cat) {
+  const k = cat.toLowerCase();
+  for (const [key, icon] of Object.entries(CAT_ICONS)) {
+    if (k.includes(key)) return icon;
+  }
+  return CAT_ICONS.default;
+}
 
-// ── Init ─────────────────────────────────────────────────
+// ── State ───────────────────────────────────────────────
+let selZone=null, selCreneau=null, selCat=null;
+let cart={};
+let allProducts=[];
+let categories=[];
+
+// ── Particules ──────────────────────────────────────────
+(function initParticles() {
+  const container = document.getElementById("particles");
+  const count = 55;
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement("div");
+    p.className = "particle";
+    const size = Math.random() * 2.5 + 1;
+    p.style.cssText = `
+      width:${size}px;height:${size}px;
+      left:${Math.random()*100}%;
+      animation-duration:${Math.random()*20+15}s;
+      animation-delay:${Math.random()*20}s;
+      opacity:${Math.random()*.5+.1};
+      background:${Math.random()>.7?"#24B58E":"#9CD8E8"};
+    `;
+    container.appendChild(p);
+  }
+})();
+
+// ── Init ────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
+  emailjs.init(EMAILJS_KEY);
   buildZones();
   buildCreneaux();
-  buildCats();
   fetchProducts();
 });
 
-// ── Fetch produits depuis l'API Vercel ───────────────────
+// ── Fetch produits depuis Google Sheet via /api/products ─
 async function fetchProducts() {
-  allProducts = [
-    { id:"1",  title:"Red Bull Spring Cherry Sakura",              price:4.00,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/RedbullSakura.png?v=1775829064" },
-    { id:"2",  title:"Red Bull Winter Edition Mûre & Vanille",     price:3.50,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/Sanstitre-4.png?v=1775857858" },
-    { id:"3",  title:"Fanta Strawberry Kiwi",                      price:2.50,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/fanta-strawberry-kiwi-5740700987984-31380632961187.webp?v=1775861824" },
-    { id:"4",  title:"Mogu Mogu Bubble Gum",                       price:2.00,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/mogu-mogu-bubble-gum-8850389118856-58190657716555.webp?v=1775862489" },
-    { id:"5",  title:"Box Mystère - M",                            price:15.00, img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/boitemysteretransparent.png?v=1778084452" },
-    { id:"6",  title:"Box Mystère - L",                            price:25.00, img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/box2_c263cbcf-b2b3-45e4-8854-8e7676bd696f.png?v=1778084414" },
-    { id:"7",  title:"Nutymax Crème de Pistache",                  price:3.50,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/Nutymaxpistache.webp?v=1775939178" },
-    { id:"8",  title:"Lion Bar White Chocolate",                   price:2.00,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/LionWhite.webp?v=1775939603" },
-    { id:"9",  title:"Snickers Creamy Peanut Butter",              price:2.00,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/snickers-creamy-peanut-butter-5900951283963-32089129386147.webp?v=1775940003" },
-    { id:"10", title:"Wonka Nerds Candy Rainbow Box",              price:3.00,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/wonka-nerds-candy-rainbow-box-079200558338-35470097350819.webp?v=1775991261" },
-    { id:"11", title:"Charm's Fluffy Stuff Cotton Candy",          price:3.50,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/charm-s-fluffy-stuff-cotton-candy-014200003259-1156794123.webp?v=1775991337" },
-    { id:"12", title:"Air Heads Cherry",                           price:1.50,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/air-heads-cherry-073390002015-57934053474635.webp?v=1775991447" },
-    { id:"13", title:"Candy Pop Popcorn Twix",                     price:4.00,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/candy-pop-popcorn-twix-814109023385-33161855729827.webp?v=1775992568" },
-    { id:"14", title:"Kellogg's Pop Tarts Frosted Cherry",         price:3.50,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/kellogg-s-pop-tarts-frosted-cherry-064100147737-55488010551627.webp?v=1775992667" },
-    { id:"15", title:"American Bakery Cookies & Cream Red Velvet", price:2.50,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/AmericanBakery_2.webp?v=1775992782" },
-    { id:"16", title:"Kinder Kornetti Crema",                      price:2.00,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/kinder-kornetti-a-la-creme-de-laitjpg-300x300.png?v=1775996306" },
-    { id:"17", title:"Frutz Pomme - Glace Trompe L'Oeil",         price:3.00,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/slide-pomme-300x300.png?v=1775996391" },
-    { id:"18", title:"Mister Frutz Mini Trompe L'Oeil",           price:4.00,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/whatsapp-image-2025-10-07-at-151631-300x300.jpg?v=1775996651" },
-    { id:"19", title:"Samyang Buldak Chips Quattro Cheese",        price:4.00,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/symg-potatochip-quattro-1500xpng-300x300.webp?v=1775998710" },
-    { id:"20", title:"Pringles Mingles Jalapeno & Queso",          price:4.50,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/prod-img-7243038-00038000309588-00038000309588-c1c1-updated-300x300.png?v=1775998837" },
-    { id:"21", title:"Pringles Spicy Mayo",                        price:4.50,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/img-ajqswvu5enzyfbw4-300x300.png?v=1775998921" },
-    { id:"22", title:"Samyang Ramen Rose",                         price:2.50,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/samyang-buldak-rose-36913034854563-grandewebp.jpg?v=1775999079" },
-    { id:"23", title:"Samyang Cheese",                             price:2.50,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/samyang-buldak-cheese-hot-chicken-flavour-ramen-140gwebp-300x300.png?v=1775999173" },
-    { id:"24", title:"Poliakov Vodka 70cl",                        price:16.00, img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/shopping.webp?v=1776244049" },
-    { id:"25", title:"Jack Daniel's Old No. 7 1L",                 price:35.00, img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/Jack_Daniel.webp?v=1776244298" },
-    { id:"26", title:"Vodka Peche Ciroc 70cl",                     price:38.00, img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/ciroc-peach-flavoured-vodka.jpg?v=1776244404" },
-    { id:"27", title:"Biere Blanche 5% 1664 - 33cl",               price:2.50,  img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/1664_sapphire_blanc_bottle_33cl_wet_lr_rgb-2.png?v=1776244494" },
-    { id:"28", title:"Get 27",                                     price:14.00, img:"https://cdn.shopify.com/s/files/1/1025/6000/6484/files/FY21_GET_GET27_IPX.png?v=1776244627" },
-  ];
+  try {
+    const res = await fetch("/api/products");
+    const data = await res.json();
+    allProducts = data.products || [];
+  } catch(e) {
+    console.warn("API indisponible", e);
+    allProducts = [];
+  }
+  // Extraire les catégories uniques du sheet
+  const seen = new Set();
+  categories = [];
+  allProducts.forEach(p => {
+    const cat = (p.category || "divers").trim();
+    if (!seen.has(cat)) { seen.add(cat); categories.push(cat); }
+  });
   buildCats();
 }
 
-function getCatProducts(catId) {
-  const cat = CATEGORIES.find(c => c.id === catId);
-  if (!cat) return [];
-  return allProducts.filter(p =>
-    cat.kw.some(k => p.title.toLowerCase().includes(k))
-  );
+function getCatProducts(cat) {
+  return allProducts.filter(p => (p.category||"divers").toLowerCase() === cat.toLowerCase());
 }
 
 // ── Build UI ─────────────────────────────────────────────
 function buildZones() {
-  const g = document.getElementById("zone-grid");
-  g.innerHTML = ZONES.map(z => `
-    <button class="zone-btn" data-id="${z.id}" onclick="selectZone('${z.id}',this)">
+  document.getElementById("zone-grid").innerHTML = ZONES.map(z =>
+    `<button class="zone-btn" onclick="selectZone('${z.id}',this)">
       <span class="zone-name">${z.label}</span>
-      <span class="zone-info">${z.fee}${z.delay ? " · " + z.delay : ""}</span>
+      <span class="zone-info">${z.fee}${z.delay?" · "+z.delay:""}</span>
     </button>`).join("");
 }
 
 function buildCreneaux() {
-  const g = document.getElementById("creneau-grid");
-  g.innerHTML = CRENEAUX.map(c => `
-    <button class="creneau-btn" onclick="selectCreneau('${c.label}',this)">
+  document.getElementById("creneau-grid").innerHTML = CRENEAUX.map(c =>
+    `<button class="creneau-btn" onclick="selectCreneau('${c.label}',this)">
       <span>${c.icon}</span>${c.label}
     </button>`).join("");
 }
 
 function buildCats() {
-  const g = document.getElementById("cat-grid");
-  g.innerHTML = CATEGORIES.map(cat => {
-    const count = getCatProducts(cat.id).length;
-    const active = selCat === cat.id ? " sel" : "";
-    return `<button class="cat-btn${active}" onclick="selectCat('${cat.id}',this)">
-      <span class="cat-icon">${cat.icon}</span>
-      <span>${cat.label}</span>
+  const loading = document.getElementById("cat-loading");
+  const grid    = document.getElementById("cat-grid");
+  loading.style.display = "none";
+  grid.style.display    = "grid";
+
+  if (categories.length === 0) {
+    grid.innerHTML = `<div style="color:var(--muted);font-size:.85rem;grid-column:1/-1;text-align:center;padding:20px 0">
+      Catalogue en cours de chargement…<br><span style="font-size:.75rem">Revenez dans quelques minutes.</span>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = categories.map(cat => {
+    const count = getCatProducts(cat).length;
+    const active = selCat === cat ? " sel" : "";
+    return `<button class="cat-btn${active}" onclick="selectCat('${cat}',this)">
+      <span class="cat-icon">${catIcon(cat)}</span>
+      <span>${cat}</span>
       <span class="cat-count">${count} produit${count!==1?"s":""}</span>
     </button>`;
   }).join("");
 }
 
-function renderProducts(catId) {
-  const products = getCatProducts(catId);
-  const cat = CATEGORIES.find(c => c.id === catId);
-  const section = document.getElementById("products-section");
-  const header  = document.getElementById("products-header");
-  const grid    = document.getElementById("prod-grid");
+function renderProducts(cat) {
+  const products = getCatProducts(cat);
+  const section  = document.getElementById("products-section");
+  const title    = document.getElementById("products-header-title");
+  const countEl  = document.getElementById("products-header-count");
+  const grid     = document.getElementById("prod-grid");
 
-  if (products.length === 0) {
-    section.style.display = "none";
-    return;
-  }
+  if (products.length === 0) { section.style.display="none"; return; }
 
-  header.innerHTML = `<span>${cat.icon}</span><span>${cat.label}</span><span class="count">${products.length} produit${products.length!==1?"s":""}</span>`;
+  title.innerHTML   = `${catIcon(cat)} ${cat}`;
+  countEl.textContent = `${products.length} produit${products.length!==1?"s":""}`;
 
   grid.innerHTML = products.map(p => {
     const qty = cart[p.id]?.qty || 0;
@@ -470,14 +521,14 @@ function renderProducts(catId) {
     <div class="prod-card${qty>0?" in-cart":""}" id="pc-${p.id}">
       <div class="prod-img-wrap">
         ${p.img
-          ? `<img src="${p.img}" alt="${p.title}" onerror="this.parentNode.innerHTML='<span class=\\'fallback\\'>🛍️</span>'">`
-          : `<span class="fallback">🛍️</span>`}
-        ${qty>0 ? `<div class="qty-badge">${qty}</div>` : ""}
+          ? `<img src="${p.img}" alt="${p.title}" loading="lazy" onerror="this.parentNode.innerHTML='<span class=\\'fallback\\'>${catIcon(cat)}</span>'">`
+          : `<span class="fallback">${catIcon(cat)}</span>`}
+        ${qty>0?`<div class="qty-badge">${qty}</div>`:""}
       </div>
       <div class="prod-info">
         <div class="prod-title">${p.title}</div>
         <div class="prod-footer">
-          <span class="prod-price${!hasPrice?" free":""}">${hasPrice ? p.price.toFixed(2)+" €" : "Voir prix"}</span>
+          <span class="prod-price${!hasPrice?" free":""}">${hasPrice?p.price.toFixed(2)+" €":"Sur devis"}</span>
           ${qty===0
             ? `<button class="btn-add" onclick="addItem('${p.id}','${p.title.replace(/'/g,"\\'")}',${p.price})">+ Ajouter</button>`
             : `<div class="qty-ctrl">
@@ -494,191 +545,184 @@ function renderProducts(catId) {
 }
 
 // ── Interactions ─────────────────────────────────────────
-function selectZone(id, btn) {
-  document.querySelectorAll(".zone-btn").forEach(b => b.classList.remove("sel"));
-  btn.classList.add("sel");
-  selZone = id;
-  document.getElementById("err-zone").style.display = "none";
+function selectZone(id,btn) {
+  document.querySelectorAll(".zone-btn").forEach(b=>b.classList.remove("sel"));
+  btn.classList.add("sel"); selZone=id;
+  document.getElementById("err-zone").style.display="none";
 }
-
-function selectCreneau(label, btn) {
-  document.querySelectorAll(".creneau-btn").forEach(b => b.classList.remove("sel"));
-  btn.classList.add("sel");
-  selCreneau = label;
-  document.getElementById("err-creneau").style.display = "none";
+function selectCreneau(label,btn) {
+  document.querySelectorAll(".creneau-btn").forEach(b=>b.classList.remove("sel"));
+  btn.classList.add("sel"); selCreneau=label;
+  document.getElementById("err-creneau").style.display="none";
 }
-
-function selectCat(id, btn) {
-  if (selCat === id) {
-    selCat = null;
-    document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("sel"));
-    document.getElementById("products-section").style.display = "none";
+function selectCat(cat,btn) {
+  if (selCat===cat) {
+    selCat=null;
+    document.querySelectorAll(".cat-btn").forEach(b=>b.classList.remove("sel"));
+    document.getElementById("products-section").style.display="none";
   } else {
-    selCat = id;
-    document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("sel"));
+    selCat=cat;
+    document.querySelectorAll(".cat-btn").forEach(b=>b.classList.remove("sel"));
     btn.classList.add("sel");
-    renderProducts(id);
+    renderProducts(cat);
   }
 }
-
-function addItem(id, title, price) {
-  cart[id] = { title, price, qty: 1 };
-  updateCartUI();
-  renderProducts(selCat);
+function addItem(id,title,price) {
+  cart[id]={title,price,qty:1};
+  updateCartUI(); renderProducts(selCat);
 }
-
-function changeQty(id, delta) {
+function changeQty(id,delta) {
   if (!cart[id]) return;
-  cart[id].qty += delta;
-  if (cart[id].qty <= 0) delete cart[id];
-  updateCartUI();
-  renderProducts(selCat);
+  cart[id].qty+=delta;
+  if (cart[id].qty<=0) delete cart[id];
+  updateCartUI(); renderProducts(selCat);
 }
-
 function updateCartUI() {
-  const items = Object.entries(cart);
-  const count = items.reduce((a, [,v]) => a + v.qty, 0);
-  const total = items.reduce((a, [,v]) => a + (v.price||0)*v.qty, 0);
-  const wrap  = document.getElementById("cart-strip-wrap");
-  if (count === 0) { wrap.innerHTML = ""; return; }
-  wrap.innerHTML = `<div class="cart-strip">
+  const items=Object.entries(cart);
+  const count=items.reduce((a,[,v])=>a+v.qty,0);
+  const total=items.reduce((a,[,v])=>a+(v.price||0)*v.qty,0);
+  const wrap=document.getElementById("cart-strip-wrap");
+  if (count===0){wrap.innerHTML="";return;}
+  wrap.innerHTML=`<div class="cart-strip">
     <div class="cart-strip-info">🛒 <span>${count} article${count>1?"s":""} sélectionné${count>1?"s":""}</span></div>
-    ${total>0 ? `<span class="cart-total">≥ ${total.toFixed(2)} €</span>` : ""}
+    ${total>0?`<span class="cart-total">≥ ${total.toFixed(2)} €</span>`:""}
   </div>`;
 }
 
-// ── Navigation & validation ───────────────────────────────
+// ── Navigation ────────────────────────────────────────────
 function goTo(step) {
-  if (step === 2 && !validateStep1()) return;
-  if (step === 3 && !validateStep2()) return;
-  currentStep = step;
-
-  // Panels
-  ["panel1","panel2","panel3","panel-ok"].forEach(id => {
-    document.getElementById(id).classList.remove("show");
-  });
-  document.getElementById(step === "ok" ? "panel-ok" : "panel"+step).classList.add("show");
-
-  // Hero visible seulement step 1
-  document.getElementById("hero").style.display = step === 1 ? "block" : "none";
-
-  // Step indicator
+  if (step===2&&!validateStep1()) return;
+  if (step===3&&!validateStep2()) return;
+  ["panel1","panel2","panel3","panel-ok"].forEach(id=>document.getElementById(id).classList.remove("show"));
+  document.getElementById(step==="ok"?"panel-ok":"panel"+step).classList.add("show");
+  document.getElementById("hero").style.display=step===1?"block":"none";
   updateStepNav(step);
-
   window.scrollTo({top:0,behavior:"smooth"});
-
-  if (step === 3) buildRecap();
+  if (step===3) buildRecap();
 }
-
 function updateStepNav(step) {
-  [1,2,3].forEach(n => {
-    const num = document.getElementById("sn"+n);
-    const lbl = document.getElementById("sl"+n);
-    num.className = "step-num" + (n < step ? " done" : n === step ? " active" : "");
-    num.textContent = n < step ? "✓" : n;
-    lbl.className = "step-lbl" + (n === step ? " active" : "");
+  [1,2,3].forEach(n=>{
+    const num=document.getElementById("sn"+n);
+    const lbl=document.getElementById("sl"+n);
+    num.className="step-num"+(n<step?" done":n===step?" active":"");
+    num.textContent=n<step?"✓":n;
+    lbl.className="step-lbl"+(n===step?" active":"");
   });
-  ["line12","line23"].forEach((id,i) => {
-    document.getElementById(id).className = "step-line" + (step > i+1 ? " done" : "");
+  ["line12","line23"].forEach((id,i)=>{
+    document.getElementById(id).className="step-line"+(step>i+1?" done":"");
   });
 }
 
+// ── Validation ────────────────────────────────────────────
 function validateStep1() {
-  let ok = true;
-  if (!selZone) { document.getElementById("err-zone").style.display="block"; ok=false; }
-  const addrEl = document.getElementById("adresse");
-  const addrWrap = addrEl.closest(".field");
-  if (!addrEl.value.trim()) { addrWrap.classList.add("has-error"); ok=false; }
+  let ok=true;
+  if (!selZone){document.getElementById("err-zone").style.display="block";ok=false;}
+  const addrEl=document.getElementById("adresse");
+  const addrWrap=addrEl.closest(".field");
+  if (!addrEl.value.trim()){addrWrap.classList.add("has-error");ok=false;}
   else addrWrap.classList.remove("has-error");
-  if (!selCreneau) { document.getElementById("err-creneau").style.display="block"; ok=false; }
+  if (!selCreneau){document.getElementById("err-creneau").style.display="block";ok=false;}
   return ok;
 }
-
 function validateStep2() {
-  const ft = document.getElementById("freetext").value.trim();
-  const hasCart = Object.keys(cart).length > 0;
-  if (!hasCart && !ft) {
-    document.getElementById("err-commande").style.display = "block";
-    return false;
-  }
-  document.getElementById("err-commande").style.display = "none";
+  const ft=document.getElementById("freetext").value.trim();
+  const hasCart=Object.keys(cart).length>0;
+  if (!hasCart&&!ft){document.getElementById("err-commande").style.display="block";return false;}
+  document.getElementById("err-commande").style.display="none";
   return true;
 }
-
 function validateStep3() {
-  let ok = true;
-  const prenomEl = document.getElementById("prenom");
-  const fp = document.getElementById("f-prenom");
-  if (!prenomEl.value.trim()) { fp.classList.add("has-error"); ok=false; }
+  let ok=true;
+  const prenomEl=document.getElementById("prenom");
+  const fp=document.getElementById("f-prenom");
+  if (!prenomEl.value.trim()){fp.classList.add("has-error");ok=false;}
   else fp.classList.remove("has-error");
-  const telEl = document.getElementById("tel");
-  const ft = document.getElementById("f-tel");
-  if (!telEl.value.trim() || telEl.value.replace(/\s/g,"").length < 9) { ft.classList.add("has-error"); ok=false; }
-  else ft.classList.remove("has-error");
+  const telEl=document.getElementById("tel");
+  const ft2=document.getElementById("f-tel");
+  if (!telEl.value.trim()||telEl.value.replace(/\s/g,"").length<9){ft2.classList.add("has-error");ok=false;}
+  else ft2.classList.remove("has-error");
   return ok;
 }
 
+// ── Récap ─────────────────────────────────────────────────
 function buildRecap() {
-  const zone  = ZONES.find(z => z.id === selZone);
-  const items = Object.entries(cart);
-  const total = items.reduce((a,[,v]) => a+(v.price||0)*v.qty, 0);
-  const ft    = document.getElementById("freetext").value.trim();
-
-  let html = `
+  const zone=ZONES.find(z=>z.id===selZone);
+  const items=Object.entries(cart);
+  const total=items.reduce((a,[,v])=>a+(v.price||0)*v.qty,0);
+  const ft=document.getElementById("freetext").value.trim();
+  let html=`
     <div class="recap-row"><span class="rk">Zone</span><span class="rv">${zone?.label||"—"}</span></div>
     <div class="recap-row"><span class="rk">Adresse</span><span class="rv">${document.getElementById("adresse").value}</span></div>
     <div class="recap-row"><span class="rk">Créneau</span><span class="rv">${selCreneau||"—"}</span></div>`;
-
-  if (items.length > 0) {
-    html += `<div class="recap-items">`;
-    items.forEach(([,v]) => {
-      html += `<div class="recap-item"><span>${v.qty}× ${v.title}</span><span class="recap-item-price">${v.price>0?(v.price*v.qty).toFixed(2)+" €":"—"}</span></div>`;
+  if (items.length>0) {
+    html+=`<div class="recap-items">`;
+    items.forEach(([,v])=>{
+      html+=`<div class="recap-item"><span>${v.qty}× ${v.title}</span><span class="recap-item-price">${v.price>0?(v.price*v.qty).toFixed(2)+" €":"—"}</span></div>`;
     });
-    if (total > 0) html += `<div class="recap-item" style="margin-top:6px;font-weight:600;border-top:1px solid rgba(156,216,232,.08);padding-top:6px"><span>Total estimé</span><span class="recap-item-price">≥ ${total.toFixed(2)} €</span></div>`;
-    html += `</div>`;
+    if (total>0) html+=`<div class="recap-item" style="margin-top:6px;font-weight:600;border-top:1px solid rgba(156,216,232,.08);padding-top:6px"><span>Total estimé</span><span class="recap-item-price">≥ ${total.toFixed(2)} €</span></div>`;
+    html+=`</div>`;
   }
-  if (ft) html += `<div class="recap-row" style="margin-top:8px"><span class="rk">Autres</span><span class="rv">${ft}</span></div>`;
-  document.getElementById("recap-block").innerHTML = html;
+  if (ft) html+=`<div class="recap-row" style="margin-top:8px"><span class="rk">Autres</span><span class="rv">${ft}</span></div>`;
+  document.getElementById("recap-block").innerHTML=html;
 }
 
-function submit() {
+// ── Submit ─────────────────────────────────────────────────
+async function submit() {
   if (!validateStep3()) return;
-  const prenom = document.getElementById("prenom").value.trim();
-  const tel    = document.getElementById("tel").value.trim();
-  const note   = document.getElementById("note").value.trim();
-  const ft     = document.getElementById("freetext").value.trim();
-  const zone   = ZONES.find(z => z.id === selZone);
-  const items  = Object.entries(cart);
+  const btn=document.getElementById("btn-submit");
+  btn.textContent="Envoi en cours…"; btn.disabled=true;
 
-  const lines = items.map(([,v]) => `  • ${v.qty}× ${v.title}${v.price>0?" ("+( v.price*v.qty).toFixed(2)+"€)":""}`).join("\n");
-  const msg = [
-    `🛒 *Nouvelle commande SEVEN*`,
-    ``,
-    `👤 ${prenom}`,
-    `📞 ${tel}`,
-    `📍 ${zone?.label} — ${document.getElementById("adresse").value}`,
-    `🕐 ${selCreneau}`,
-    ``,
-    lines ? `🛍️ Panier :\n${lines}` : "",
-    ft ? `📝 Autres : ${ft}` : "",
-    note ? `💬 Note livreur : ${note}` : "",
+  const prenom=document.getElementById("prenom").value.trim();
+  const tel=document.getElementById("tel").value.trim();
+  const note=document.getElementById("note").value.trim();
+  const ft=document.getElementById("freetext").value.trim();
+  const zone=ZONES.find(z=>z.id===selZone);
+  const adresse=document.getElementById("adresse").value;
+  const items=Object.entries(cart);
+
+  const lines=items.map(([,v])=>`• ${v.qty}× ${v.title}${v.price>0?" ("+( v.price*v.qty).toFixed(2)+"€)":""}`).join("\n");
+  const total=items.reduce((a,[,v])=>a+(v.price||0)*v.qty,0);
+
+  // Email via EmailJS
+  try {
+    await emailjs.send(EMAILJS_SVC, EMAILJS_TPL, {
+      to_email:    NOTIFY_EMAIL,
+      client_name: prenom,
+      client_tel:  tel,
+      zone:        zone?.label,
+      adresse:     adresse,
+      creneau:     selCreneau,
+      panier:      lines || "(champ libre)",
+      freetext:    ft || "—",
+      total:       total>0?"≥ "+total.toFixed(2)+" €":"À confirmer",
+      note:        note || "—",
+    });
+  } catch(e) { console.warn("EmailJS:", e); }
+
+  // WhatsApp
+  const msg=[
+    `🛒 *Nouvelle commande SEVEN*`,``,
+    `👤 ${prenom}`,`📞 ${tel}`,
+    `📍 ${zone?.label} — ${adresse}`,
+    `🕐 ${selCreneau}`,``,
+    lines?`🛍️ Panier :\n${lines}`:"",
+    ft?`📝 Autres : ${ft}`:"",
+    total>0?`💶 Total estimé : ≥ ${total.toFixed(2)} €`:"",
+    note?`💬 Note : ${note}`:"",
   ].filter(Boolean).join("\n");
 
-  document.getElementById("wa-link").href = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
-  document.getElementById("s-tel").textContent = tel;
+  document.getElementById("wa-link").href=`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
+  document.getElementById("s-tel").textContent=tel;
 
-  // Marquer toutes les étapes done
-  [1,2,3].forEach(n => {
-    const num = document.getElementById("sn"+n);
-    num.className = "step-num done";
-    num.textContent = "✓";
+  [1,2,3].forEach(n=>{
+    const num=document.getElementById("sn"+n);
+    num.className="step-num done"; num.textContent="✓";
+    document.getElementById("sl"+n).classList.remove("active");
   });
-  document.getElementById("line12").className = "step-line done";
-  document.getElementById("line23").className = "step-line done";
-
-  ["panel1","panel2","panel3"].forEach(id => document.getElementById(id).classList.remove("show"));
+  ["line12","line23"].forEach(id=>document.getElementById(id).className="step-line done");
+  ["panel1","panel2","panel3"].forEach(id=>document.getElementById(id).classList.remove("show"));
   document.getElementById("panel-ok").classList.add("show");
-  document.getElementById("hero").style.display = "none";
+  document.getElementById("hero").style.display="none";
   window.scrollTo({top:0,behavior:"smooth"});
 }
 </script>
