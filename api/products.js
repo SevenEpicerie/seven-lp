@@ -2,7 +2,7 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
 
   // Export CSV directement - beaucoup plus simple à parser
-  const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR-R7MIKmy2NfPW2rd1ATy3NHuICAI_Cm7iHEWX-KEY0Apgpvmoe_e5hOx/pub?output=csv";
+  const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR-R7MIKmy2NfPW2rd1ATy3NHuICAI_Cm7iHEWX-KEY0Apgpvmoe_e5hOxoMHK4r2kRHxApo6E-frE7/pub?gid=655138725&single=true&output=csv";
 
   try {
     const response = await fetch(url);
