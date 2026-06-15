@@ -783,6 +783,7 @@ function renderSubCats(cat, subs){
 
 function selSubCatFn(sub, btn, cat){
   selSubCat = sub;
+  selCat = cat;
   document.querySelectorAll("#subcat-section .cat-btn").forEach(b=>b.classList.remove("sel"));
   btn.classList.add("sel");
   renderProds(cat, sub);
@@ -790,13 +791,13 @@ function selSubCatFn(sub, btn, cat){
 
 function addP(id,title,price){
   cart[id]={title,price,qty:1};
-  updateCart(); renderProds(selCat);
+  updateCart(); renderProds(selCat, selSubCat);
 }
 function chgQ(id,d){
   if(!cart[id])return;
   cart[id].qty+=d;
   if(cart[id].qty<=0)delete cart[id];
-  updateCart(); renderProds(selCat);
+  updateCart(); renderProds(selCat, selSubCat);
 }
 function updateCart(){
   const items=Object.entries(cart);
