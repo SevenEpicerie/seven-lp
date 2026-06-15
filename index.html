@@ -173,6 +173,16 @@ body{background:var(--bg);color:var(--white);font-family:'Inter',sans-serif;font
 .cat-count{font-size:.62rem;color:var(--muted);font-weight:400}
 .cat-btn.sel .cat-count{color:rgba(0,255,165,.5)}
 
+/* ── Sous-catégories ── */
+.subcat-btn{
+  background:var(--card2);border:2px solid var(--border);border-radius:99px;
+  padding:7px 14px;cursor:pointer;color:var(--white);
+  font-family:'Inter',sans-serif;font-size:.78rem;font-weight:500;
+  transition:all .2s;white-space:nowrap;
+}
+.subcat-btn:hover{border-color:rgba(36,181,142,.4)}
+.subcat-btn.sel{border-color:var(--mint);background:rgba(36,181,142,.1);color:var(--mint2)}
+
 /* ── Produits ── */
 .prod-section{border-top:1px solid var(--border);padding-top:16px}
 .prod-section-h{display:flex;align-items:center;gap:8px;margin-bottom:14px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.92rem}
@@ -405,6 +415,7 @@ footer a{color:var(--mint);text-decoration:none}
       <div class="card-sub">Tapez sur une catégorie pour voir les produits disponibles</div>
       <div class="loading" id="cat-load"><span class="ld"></span><span class="ld"></span><span class="ld"></span></div>
       <div class="cat-grid" id="cat-grid" style="display:none"></div>
+      <div id="subcat-section" style="display:none"></div>
       <div class="prod-section" id="prod-section" style="display:none">
         <div class="prod-section-h" id="prod-h"></div>
         <div class="prod-grid" id="prod-grid"></div>
@@ -571,7 +582,7 @@ function catIco(cat){
 }
 
 // ══ STATE ══════════════════════════════════════════════════
-let selZone=null, selCreneau=null, selCat=null;
+let selZone=null, selCreneau=null, selCat=null, selSubCat=null;
 let cart={}, products=[], cats=[];
 
 // ══ INIT ═══════════════════════════════════════════════════
@@ -625,7 +636,7 @@ async function fetchProducts(){
   buildCats();
 }
 
-function catProds(cat){ return products.filter(p=>(p.category||"divers").toLowerCase()===cat.toLowerCase()); }
+
 
 // ══ BUILD UI ═══════════════════════════════════════════════
 function buildCreneaux(){
@@ -660,8 +671,10 @@ function buildCats(){
   }).join("");
 }
 
-function renderProds(cat){
-  const ps=catProds(cat);
+function renderProds(cat, sub){
+  const ps = sub 
+    ? products.filter(p => p.category.trim()===cat.trim() && p.subcategory.trim()===sub.trim())
+    : products.filter(p => p.category.trim()===cat.trim());
   const sec=document.getElementById("prod-section");
   const h=document.getElementById("prod-h");
   const g=document.getElementById("prod-grid");
@@ -716,15 +729,58 @@ function updateTime(v){ selCreneau=v?"À "+v:null; }
 
 function selCatFn(cat,btn){
   if(selCat===cat){
-    selCat=null;
+    selCat=null; selSubCat=null;
     document.querySelectorAll(".cat-btn").forEach(b=>b.classList.remove("sel"));
     document.getElementById("prod-section").style.display="none";
+    document.getElementById("subcat-section").style.display="none";
   }else{
-    selCat=cat;
+    selCat=cat; selSubCat=null;
     document.querySelectorAll(".cat-btn").forEach(b=>b.classList.remove("sel"));
     btn.classList.add("sel");
-    renderProds(cat);
+    // Check if subcategories exist
+    const subs = getSubCats(cat);
+    console.log("Subs for", cat, ":", subs);
+    if(subs.length > 1){
+      renderSubCats(cat, subs);
+      document.getElementById("prod-section").style.display="none";
+    } else {
+      document.getElementById("subcat-section").style.display="none";
+      renderProds(cat, null);
+    }
   }
+}
+
+function getSubCats(cat){
+  const prods = products.filter(p => p.category.trim() === cat.trim());
+  const seen = new Set();
+  prods.forEach(p => { if(p.subcategory && p.subcategory.trim()) seen.add(p.subcategory.trim()); });
+  return [...seen];
+}
+
+function renderSubCats(cat, subs){
+  const section = document.getElementById("subcat-section");
+  section.style.display = "block";
+  section.innerHTML = `
+    <div style="border-top:1px solid var(--border);padding-top:16px;margin-top:4px">
+      <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.85rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">Sous-catégorie</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <button class="subcat-btn sel" onclick="selSubCatFn(null,this,'${cat}')">
+          Tout voir <span style="color:var(--muted);font-size:.72rem">(${products.filter(p=>p.category===cat).length})</span>
+        </button>
+        ${subs.map(sub => {
+          const count = products.filter(p=>p.category===cat && p.subcategory===sub).length;
+          return `<button class="subcat-btn" onclick="selSubCatFn('${sub.replace(/'/g,"\'")}',this,'${cat}')">${sub} <span style="color:var(--muted);font-size:.72rem">(${count})</span></button>`;
+        }).join('')}
+      </div>
+    </div>`;
+  renderProds(cat, null);
+}
+
+function selSubCatFn(sub, btn, cat){
+  selSubCat = sub;
+  document.querySelectorAll(".subcat-btn").forEach(b=>b.classList.remove("sel"));
+  btn.classList.add("sel");
+  renderProds(cat, sub);
 }
 
 function addP(id,title,price){
