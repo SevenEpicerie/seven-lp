@@ -3,7 +3,7 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Methods", "GET");
 
   const SHEET_ID = "1b5v3fzVa8xBgrp9IZYmu0mfJodjE3OStLspC1b9ghIw";
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=seven-catalogue`;
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=seven-catalogue&headers=1`;
 
   try {
     const response = await fetch(url);
@@ -14,27 +14,21 @@ export default async function handler(req, res) {
 
     const json = JSON.parse(jsonStr);
     const rows = json.table.rows;
-    const cols = json.table.cols.map(c => c.label.toLowerCase().trim());
-
-    console.log("Colonnes détectées:", cols);
-
+    // Colonnes : A=id, B=title, C=price, D=category, E=subcategory, F=image
     const products = rows
-      .filter(row => row.c && row.c[0] && row.c[0].v !== null)
+      .filter(row => row.c && row.c[1] && row.c[1].v)
       .map(row => {
-        const obj = {};
-        cols.forEach((col, i) => {
-          obj[col] = row.c[i] ? String(row.c[i].v ?? "").trim() : "";
-        });
+        const get = (i) => row.c[i] ? String(row.c[i].v ?? "").trim() : "";
         return {
-          id:          obj.id || String(Math.random()),
-          title:       obj.title || "",
-          price:       parseFloat(obj.price) || 0,
-          category:    obj.category || "Divers",
-          subcategory: obj.subcategory || "",
-          img:         obj.image || null,
+          id:          get(0) || String(Math.random()),
+          title:       get(1),
+          price:       parseFloat(get(2)) || 0,
+          category:    get(3) || "Divers",
+          subcategory: get(4) || "",
+          img:         get(5) || null,
         };
       })
-      .filter(p => p.title);
+      .filter(p => p.title && p.title !== "title");
 
     res.setHeader("Cache-Control", "s-maxage=60, stale-while-revalidate");
     return res.status(200).json({ products, count: products.length });
