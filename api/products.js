@@ -3,7 +3,7 @@ export default async function handler(req, res) {
 
   const SHEET_ID = "1b5v3fzVa8xBgrp9IZYmu0mfJodjE3OStLspC1b9ghIw";
   // Export CSV directement - beaucoup plus simple à parser
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=655138725`;
 
   try {
     const response = await fetch(url);
