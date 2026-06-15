@@ -1,10 +1,5 @@
 {
   "version": 2,
-  "functions": {
-    "api/products.js": {
-      "runtime": "@vercel/node@3"
-    }
-  },
   "routes": [
     { "src": "/api/products", "dest": "/api/products.js" },
     { "src": "/(.*)", "dest": "/index.html" }
