@@ -1,9 +1,8 @@
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
 
-  const SHEET_ID = "1b5v3fzVa8xBgrp9IZYmu0mfJodjE3OStLspC1b9ghIw";
   // Export CSV directement - beaucoup plus simple à parser
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=655138725`;
+  const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR-R7MIKmy2NfPW2rd1ATy3NHuICAI_Cm7iHEWX-KEY0Apgpvmoe_e5hOx/pub?output=csv";
 
   try {
     const response = await fetch(url);
