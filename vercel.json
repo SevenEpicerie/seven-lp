@@ -1,15 +1,12 @@
 {
   "version": 2,
-  "builds": [
-    { "src": "products.js", "use": "@vercel/node" },
-    { "src": "index.html", "use": "@vercel/static" },
-    { "src": "*.png", "use": "@vercel/static" },
-    { "src": "*.jpg", "use": "@vercel/static" },
-    { "src": "*.webp", "use": "@vercel/static" }
-  ],
+  "functions": {
+    "api/products.js": {
+      "runtime": "@vercel/node@3"
+    }
+  },
   "routes": [
-    { "src": "/api/products", "dest": "/products.js" },
-    { "src": "/logoombretr.png", "dest": "/logoombretr.png" },
+    { "src": "/api/products", "dest": "/api/products.js" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
