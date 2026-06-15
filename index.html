@@ -662,7 +662,7 @@ function buildCats(){
     return;
   }
   grid.innerHTML = cats.map(cat=>{
-    const n=catProds(cat).length;
+    const n=products.filter(p=>p.category.trim()===cat.trim()).length;
     return `<button class="cat-btn${selCat===cat?" sel":""}" onclick="selCatFn('${cat}',this)">
       <span class="cat-icon">${catIco(cat)}</span>
       <span>${cat}</span>
