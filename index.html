@@ -173,16 +173,6 @@ body{background:var(--bg);color:var(--white);font-family:'Inter',sans-serif;font
 .cat-count{font-size:.62rem;color:var(--muted);font-weight:400}
 .cat-btn.sel .cat-count{color:rgba(0,255,165,.5)}
 
-/* ── Sous-catégories ── */
-.subcat-btn{
-  background:var(--card2);border:2px solid var(--border);border-radius:99px;
-  padding:7px 14px;cursor:pointer;color:var(--white);
-  font-family:'Inter',sans-serif;font-size:.78rem;font-weight:500;
-  transition:all .2s;white-space:nowrap;
-}
-.subcat-btn:hover{border-color:rgba(36,181,142,.4)}
-.subcat-btn.sel{border-color:var(--mint);background:rgba(36,181,142,.1);color:var(--mint2)}
-
 /* ── Produits ── */
 .prod-section{border-top:1px solid var(--border);padding-top:16px}
 .prod-section-h{display:flex;align-items:center;gap:8px;margin-bottom:14px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.92rem}
@@ -757,19 +747,34 @@ function getSubCats(cat){
   return [...seen];
 }
 
+// Icônes par sous-catégorie
+const SUBCAT_ICONS = {
+  'Canettes Alcoolisées':'🥫','Bouteilles - Vodkas':'🍸','Bouteilles - Whisky':'🥃',
+  'Bouteilles - Rhums & Spiritueux':'🌴','Formules Soirée':'🎉',
+  'Sodas Classiques':'🥤','Sodas Exotiques':'🌏','Boissons Énergisantes':'⚡',
+  'Salé':'🍟','Sucré':'🍬',
+};
+
 function renderSubCats(cat, subs){
   const section = document.getElementById("subcat-section");
   section.style.display = "block";
+  const total = products.filter(p=>p.category.trim()===cat.trim()).length;
   section.innerHTML = `
     <div style="border-top:1px solid var(--border);padding-top:16px;margin-top:4px">
-      <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.85rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">Sous-catégorie</div>
-      <div style="display:flex;flex-wrap:wrap;gap:8px">
-        <button class="subcat-btn sel" onclick="selSubCatFn(null,this,'${cat}')">
-          Tout voir <span style="color:var(--muted);font-size:.72rem">(${products.filter(p=>p.category===cat).length})</span>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px;margin-bottom:4px">
+        <button class="cat-btn sel" onclick="selSubCatFn(null,this,'${cat}')">
+          <span style="font-size:1.3rem">🔍</span>
+          <span>Tout voir</span>
+          <span class="cat-count">${total} produit${total!==1?'s':''}</span>
         </button>
         ${subs.map(sub => {
-          const count = products.filter(p=>p.category===cat && p.subcategory===sub).length;
-          return `<button class="subcat-btn" onclick="selSubCatFn('${sub.replace(/'/g,"\'")}',this,'${cat}')">${sub} <span style="color:var(--muted);font-size:.72rem">(${count})</span></button>`;
+          const count = products.filter(p=>p.category.trim()===cat.trim() && p.subcategory.trim()===sub.trim()).length;
+          const icon = SUBCAT_ICONS[sub] || '🏷️';
+          return `<button class="cat-btn" onclick="selSubCatFn('${sub.replace(/'/g,"\'")}',this,'${cat}')">
+            <span style="font-size:1.3rem">${icon}</span>
+            <span>${sub}</span>
+            <span class="cat-count">${count} produit${count!==1?'s':''}</span>
+          </button>`;
         }).join('')}
       </div>
     </div>`;
@@ -778,7 +783,7 @@ function renderSubCats(cat, subs){
 
 function selSubCatFn(sub, btn, cat){
   selSubCat = sub;
-  document.querySelectorAll(".subcat-btn").forEach(b=>b.classList.remove("sel"));
+  document.querySelectorAll("#subcat-section .cat-btn").forEach(b=>b.classList.remove("sel"));
   btn.classList.add("sel");
   renderProds(cat, sub);
 }
