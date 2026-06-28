@@ -1,16 +1,18 @@
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
-
   // Export CSV directement - beaucoup plus simple à parser
   const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR8WS5ew0yzjG9IpECf8ZlTzmqxcECnSp8snnZvKgIKdL7bNflCiSkXq980htEjs1C1RIQd3idGiz9p/pub?gid=1251996621&single=true&output=csv";
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+      }
+    });
     const text = await response.text();
-
     // Parser CSV simple
     const lines = text.trim().split('\n');
     const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/"/g, ''));
-    
+
     const products = lines.slice(1)
       .filter(line => line.trim())
       .map(line => {
